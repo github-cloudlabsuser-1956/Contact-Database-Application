@@ -1,0 +1,98 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "sqlServerName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the SQL Server."
+        }
+      },
+      "sqlDatabaseName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the SQL Database."
+        }
+      },
+      "appServicePlanName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the App Service Plan."
+        }
+      },
+      "appServiceName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the App Service."
+        }
+      },
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description": "Location for all resources."
+        }
+      }
+    },
+    "variables": {},
+    "resources": [
+      {
+        "type": "Microsoft.Sql/servers",
+        "apiVersion": "2019-06-01-preview",
+        "name": "[parameters('sqlServerName')]",
+        "location": "[parameters('location')]",
+        "properties": {
+          "administratorLogin": "sqladmin",
+          "administratorLoginPassword": "ComplexPassword!23"
+        },
+        "resources": [
+          {
+            "type": "databases",
+            "apiVersion": "2019-06-01-preview",
+            "name": "[parameters('sqlDatabaseName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+              "collation": "SQL_Latin1_General_CP1_CI_AS",
+              "maxSizeBytes": "2147483648",
+              "requestedServiceObjectiveName": "S0"
+            },
+            "dependsOn": [
+              "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Microsoft.Web/serverfarms",
+        "apiVersion": "2019-08-01",
+        "name": "[parameters('appServicePlanName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "B1",
+          "tier": "Basic"
+        }
+      },
+      {
+        "type": "Microsoft.Web/sites",
+        "apiVersion": "2019-08-01",
+        "name": "[parameters('appServiceName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+        ],
+        "properties": {
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+        }
+      }
+    ],
+    "outputs": {
+      "sqlServerUrl": {
+        "type": "string",
+        "value": "[concat('jdbc:sqlserver://', parameters('sqlServerName'), '.database.windows.net:1433')]"
+      },
+      "appServiceUrl": {
+        "type": "string",
+        "value": "[concat('https://', parameters('appServiceName'), '.azurewebsites.net')]"
+      }
+    }
+  }
