@@ -3,19 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "sqlServerName": {
-        "value": "contactdbserver"
+        "value": "webappdbserver-krishna-copilot"
       },
       "sqlDatabaseName": {
-        "value": "ContactDB"
+        "value": "ContactDB-krishna-copilot"
       },
       "appServicePlanName": {
-        "value": "ContactAppServicePlan"
+        "value": "ContactAppServicePlan-krishna-copilot"
       },
       "appServiceName": {
-        "value": "ContactAppService"
+        "value": "ContactAppService-krishna-copilot"
       },
       "location": {
-        "value": "East US"
+        "value": "australiasoutheast"
       }
     }
   }
